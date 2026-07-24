@@ -1,0 +1,28 @@
+# Compiled binaries
+wvd
+wvd.exe
+main
+main.exe
+*.o
+*.obj
+*.exe
+*.out
+
+# Build and tooling artifacts
+compile_commands.json
+.cache/
+
+# Editor backups and autosaves
+*~
+\#*\#
+.\#*
+*.swp
+*.swo
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Local notes and scratch files
+notes/
+scratch/
