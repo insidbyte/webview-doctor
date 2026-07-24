@@ -61,8 +61,11 @@ why nobody currently answers that question.
 No dependencies beyond a C compiler and adb in your PATH.
 
 ```
-gcc -Wall -Wextra -g main.c src/device.c src/process.c src/doctor.c -o wvd
+make
 ```
+
+This produces `wvd` (or `wvd.exe` on Windows). `make clean` removes the build
+output, and `make check` runs the binary under valgrind on Linux.
 
 Tested on Linux and on Windows through MSYS2. Platform specific code is isolated in
 `src/process.c`, everything else is portable C.
@@ -73,7 +76,12 @@ Tested on Linux and on Windows through MSYS2. Platform specific code is isolated
 ./wvd
 ```
 
-That's it for now. Make sure your device is connected and USB debugging is enabled.
+Make sure your device is connected and USB debugging is enabled.
+
+There is also a `--fake` flag that feeds the parser a canned adb response
+instead of talking to a real device. It covers the states that are awkward to
+reproduce on demand, like `offline`, which is handy when changing the parsing
+code.
 
 ## Status
 
