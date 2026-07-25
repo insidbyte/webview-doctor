@@ -12,7 +12,9 @@ struct device {
   char id[D_ILEN];
   char state[D_SLEN];
 };
+
 char *append(char *buffer, size_t *count, size_t *capacity, const char *line);
 void allocate_d(char *str, struct device *d);
-int compute_lines(const char *buffer, struct device *d);
+int compute_lines(const char *buffer, struct device *d, int max);
+int find_devices(struct device *out, int max);
 #endif

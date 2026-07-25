@@ -1,5 +1,5 @@
 CC      ?= gcc
-CFLAGS  := -Wall -Wextra -g -std=c99
+CFLAGS  := -Wall -Wextra -g -std=c99 -D_POSIX_C_SOURCE=200809L
 TARGET  := wvd
 
 # Windows builds need the .exe suffix

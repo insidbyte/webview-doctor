@@ -1,7 +1,35 @@
 #include "device.h"
+#include "process.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+
+
+/* Runs "adb devices", captures its output and parses it into `out`.
+ * `out` must have room for `max` entries. Returns the number of devices
+ * found (possibly zero), or -1 if adb could not be started or memory ran out.
+ */
+int find_devices(struct device *out, int max) {
+  FILE *adb_devices = proc_open("adb devices");
+  if (!adb_devices) return -1;
+  size_t count = 0;
+  size_t capacity = 16;
+  char *device_buffer = malloc(capacity);
+    
+  if (!device_buffer) { proc_close(adb_devices); return -1; }
+  device_buffer[0] = '\0';
+
+  char str_devices[MAX_LEN];
+  
+  while (fgets(str_devices, MAX_LEN, adb_devices)) {
+    device_buffer = append(device_buffer, &count, &capacity, str_devices);
+  }
+  int n = compute_lines(device_buffer, out, max);
+  free(device_buffer);
+  proc_close(adb_devices);
+  return n;
+}
+
 
 /* Appends `line` to the end of `buffer`, growing it when it runs out of room.
  *
@@ -67,27 +95,26 @@ void allocate_d(char *str, struct device *d){
   d->state[count] = '\0';
 }
 
-/* Parses the whole output of "adb devices" into an array of devices.
+/* Parses the output of "adb devices" into an array of devices.
  *
  * A line is treated as a device only if it contains a tab, which is what adb
  * uses to separate the serial from the state. Everything else is ignored:
  * the "List of devices attached" header, blank lines, and the daemon startup
  * messages that adb prints on first run.
  *
- * `d` must have room for at least D_MAX entries. Returns how many devices
- * were found, which can be zero.
+ * Stops after `max` devices to avoid overflowing `d`. Returns how many were
+ * found, which can be zero.
  */
-int compute_lines(const char *buffer, struct device *d){
+int compute_lines(const char *buffer, struct device *d, int max){
   char line[MAX_LEN];
   int count = 0;
   int count_d = 0;
   const char del = '\t';
-
-  while(*buffer){
+  while(*buffer && count_d < max){
     if(*buffer == '\n'){
       line[count] = '\0';
       char *tab = strchr(line, del);
-      if(tab && count_d < D_MAX){
+      if(tab){
         allocate_d(line, &d[count_d]);
         count_d++;
       }
